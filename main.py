@@ -48,16 +48,16 @@ class Record:
         self.phones = []
 
     def add_phone(self, value):
-        self.phones.append(Field(value))
+        self.phones.append(Phone(value))
         return self.phones
 
     def edit_phone(self, name, value):
-        name_user = input("Enter name-key: ")
+        # name_user = input("Enter name-key: ")
 
         # new_phone = input("Enter value: ")
         if name == name_user:
             book.find(name)
-        print(book)
+
         # contact = book.find(Name(name))
 
         # return contact
@@ -65,35 +65,53 @@ class Record:
     def remove_phone(self, name):
         self.data(self, name)
 
-    def find_phone(self, *args):
-        phone = args[0]
-        name = self.name.name
-        phones = book[name]
-        if phone in phones:
-            return {name: phone}
+    def find_phone(self, name: Name):
+        for key, val in book.items():
+            if key == name:
+                for v in val:
+                    # id_first = val[0]
+                    try:
+                        id_first = val[0]
+                        id_second = val[1]
+                    except ValueError:
+                        print("Number not exist")
+                    return id_first, id_second
+        # return self.data
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
 
 class AddressBook(UserDict):
-    def add_record(self, value):
+    def add_record(self, record: Record):
+        self.data[record.name.value] = record
         self.name = Name
-        self.value = value
-
-    def find(self, key):
-        name_user = input("Enter name-key: ")
-        for val in self.data.values():
-            if val == name_user:
-                print(self.data[Phone])
+        self.value = Phone
         return self.data
 
-    def delete(self):
-        name_user1 = input("Enter name-key1: ")
+    def find(self, name_user: Name):
         for key in self.data.keys():
-            if key == name_user1:
-                self.data.setdefault(key)
+            if key == name_user:
+                return self.data.get(key)
+            # return self.data
+
+    # if Record.name.value == name_user:
+    #     print(self.data[Phone])
+    # return self.data
+
+    def delete(self, name_user):
+        # name_user = input("Enter name-key1: ")
+        for key in self.data.keys():
+            if key == name_user:
+                self.data.pop(key)
             return self.data
+
+
+def parser(text: str):
+    for func, kw in COMMANDS.items():
+        if text.startswith(kw):
+            return func, text[len(kw) :].strip().split()
+    return unknown, []
 
 
 # if __name__ == "__main__":
