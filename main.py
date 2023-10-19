@@ -47,39 +47,33 @@ class Record:
         self.name = Name(name)
         self.phones = []
 
-    def add_phone(self, value):
-        self.phones.append(Phone(value))
+    def add_phone(self, phone: Phone):
+        self.phones.append(phone)
         return self.phones
 
-    def edit_phone(self, name, value):
-        # name_user = input("Enter name-key: ")
+    def edit_phone(self, ph: Phone, new_phone: Phone) -> str:
+        # for ph in self.phones:
+        if ph in self.phones:
+            self.phones.remove(ph)
+            self.phones.append(new_phone)
+            return self.phones
+        # if not ph in self.phones or self.phones == []:
+        # return ValueError("Number not exist")
 
-        # new_phone = input("Enter value: ")
-        if name == name_user:
-            book.find(name)
+    def remove_phone(self, phone: Phone):
+        if phone in self.phones:
+            self.phones.remove(phone)
+        return self.phones
 
-        # contact = book.find(Name(name))
+    def find_phone(self, phone: Phone):
+        # for phone in self.phones:
+        if phone in self.phones:
+            return phone
 
-        # return contact
-
-    def remove_phone(self, name):
-        self.data(self, name)
-
-    def find_phone(self, name: Name):
-        for key, val in book.items():
-            if key == name:
-                for v in val:
-                    # id_first = val[0]
-                    try:
-                        id_first = val[0]
-                        id_second = val[1]
-                    except ValueError:
-                        print("Number not exist")
-                    return id_first, id_second
-        # return self.data
+        # return self.phones
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p for p in self.phones)}"
 
 
 class AddressBook(UserDict):
@@ -99,7 +93,7 @@ class AddressBook(UserDict):
     #     print(self.data[Phone])
     # return self.data
 
-    def delete(self, name_user):
+    def delete(self, name_user: Name):
         # name_user = input("Enter name-key1: ")
         for key in self.data.keys():
             if key == name_user:
@@ -107,11 +101,11 @@ class AddressBook(UserDict):
             return self.data
 
 
-def parser(text: str):
-    for func, kw in COMMANDS.items():
-        if text.startswith(kw):
-            return func, text[len(kw) :].strip().split()
-    return unknown, []
+# def parser(text: str):
+#     for func, kw in .items():
+#         if text.startswith(kw):
+#             return func, text[len(kw) :].strip().split()
+#     return unknown, []
 
 
 # if __name__ == "__main__":
@@ -122,17 +116,21 @@ john_record = Record("John")
 john_record.add_phone("5555555555")
 john_record.add_phone("1234567890")
 book.add_record(john_record)
-print(john_record)
+# print(john_record)
 jane_record = Record("Jane")
 jane_record.add_phone("9876543210")
 book.add_record(jane_record)
-print(jane_record)
+# print(jane_record)
 for name, record in book.data.items():
     print(record)
-book.find("John")
+# sq = book.find("John")
 # print(sq)
-# john = book.find("John")
-# john.edit_phone("1234567890", "1112223333")
+john = book.find("John")
 
+john_record.edit_phone("1234567890", "1112223333")
+print(john)
+found_phone = john_record.find_phone("5555555555")
+print(found_phone)
+# print(f"{john_record.name}: {found_phone}")  # Виведення: 5555555555
 # print()
-# print(book.add_record(john_record))
+# book.add_record(john_record)
