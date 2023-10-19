@@ -119,11 +119,10 @@ book.add_record(john_record)
 jane_record = Record("Jane")
 jane_record.add_phone("9876543210")
 book.add_record(jane_record)
-# print(jane_record)
+
 for name, record in book.data.items():
     print(record)
-# sq = book.find("John")
-# print(sq)
+
 john = book.find("John")
 
 john_record.edit_phone("1234567890", "1112223333")
@@ -134,7 +133,3 @@ john_record.find_phone("1234567890")
 found_phone2 = john_record.find_phone("1112223333")
 print(found_phone2)
 book.delete("Jane")
-
-# print(f"{john_record.name}: {found_phone}")  # Виведення: 5555555555
-# print()
-# book.add_record(john_record)
