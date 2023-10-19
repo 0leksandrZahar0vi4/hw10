@@ -57,16 +57,15 @@ class Record:
             self.phones.remove(ph)
             self.phones.append(new_phone)
             return self.phones
-        # if not ph in self.phones or self.phones == []:
-        # return ValueError("Number not exist")
+        if not ph in self.phones or self.phones == []:
+            raise ValueError("Number not exist")
 
-    def remove_phone(self, phone: Phone):
+    def remove_phone(self, phone):
         if phone in self.phones:
             self.phones.remove(phone)
-        return self.phones
+            return self.phones
 
     def find_phone(self, phone: Phone):
-        # for phone in self.phones:
         if phone in self.phones:
             return phone
 
@@ -131,6 +130,11 @@ john_record.edit_phone("1234567890", "1112223333")
 print(john)
 found_phone = john_record.find_phone("5555555555")
 print(found_phone)
+john_record.find_phone("1234567890")
+found_phone2 = john_record.find_phone("1112223333")
+print(found_phone2)
+book.delete("Jane")
+
 # print(f"{john_record.name}: {found_phone}")  # Виведення: 5555555555
 # print()
 # book.add_record(john_record)
