@@ -48,31 +48,34 @@ class Record:
         self.phones = []
 
     def add_phone(self, phone: Phone):
-        self.phones.append(phone)
+        self.phones.append(Phone(phone))
         return self.phones
 
-    def edit_phone(self, ph: Phone, new_phone: Phone) -> str:
+    def edit_phone(self, ph, new_phone) -> str:
         # for ph in self.phones:
-        if ph in self.phones:
-            self.phones.remove(ph)
-            self.phones.append(new_phone)
+        result = self.find_phone(ph)
+        if result:
+            self.remove_phone(ph)
+            self.add_phone(new_phone)
             return self.phones
-        if not ph in self.phones or self.phones == []:
+        if not result or self.phones == []:
             raise ValueError("Number not exist")
 
     def remove_phone(self, phone):
-        if phone in self.phones:
-            self.phones.remove(phone)
+        result = self.find_phone(phone)
+        if result:
+            self.phones.remove(result)
             return self.phones
 
     def find_phone(self, phone: Phone):
-        if phone in self.phones:
-            return phone
+        for ph in self.phones:
+            if ph.value == phone:
+                return ph
 
         # return self.phones
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p for p in self.phones)}"
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
 
 class AddressBook(UserDict):
