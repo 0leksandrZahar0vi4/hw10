@@ -23,12 +23,24 @@ class Birthday:
     #     return self
 
     def __init__(self, birthday) -> None:
+        self.__privat_birthday = None
         self.birthday = birthday
+
+    @property
+    def birthday(self):
+        return self.__privat_birthday
+
+    @birthday.setter
+    def birthday(self, birthday):
+        if not Birthday.is_valid_birth_day(self, birthday):
+            self.__privat_birthday = birthday
+        else:
+            ValueError("Invalid phone number format")
 
     def birth_day(self, birthday: str):
         if not Birthday.is_valid_birth_day(birthday):
             raise ValueError("Invalid phone number format")
-        super().__init__(birthday)
+        # super().__init__(birthday)
 
     def is_valid_birth_day(self, birthday: str):
         patern_birth = r"^(1|2)(9|0)[0-2,7-9][0-9]{1}(.|/| )(0|1)[0-9](.|/| )[0-3][0-9]"
@@ -61,15 +73,42 @@ class Field:
 
 class Name(Field):
     def self_name(self, name):
+        self.__privat_name = None
         self.name = name
         return str(self.name)
+
+    @property
+    def name(self):
+        return self.__privat_name
+
+    @name.setter
+    def name(self, name: str):
+        if name.isalpha():
+            self.__privat_name = name
+        else:
+            raise Exception("Wrong name")
 
 
 class Phone(Field):
     def __init__(self, value):
-        if not Phone.is_valid_phone(value):
+        self.__privat_value = None
+        self.value = value
+
+        # if not Phone.is_valid_phone(value):
+        #     raise ValueError("Invalid phone number format")
+        # super().__init__(value)
+
+    @property
+    def value(self):
+        return self.__privat_value
+
+    @value.setter
+    def value(self, value: str):
+        if Phone.is_valid_phone(value):
+            self.__privat_value = value
+        else:
             raise ValueError("Invalid phone number format")
-        super().__init__(value)
+        # super().__init__(value)
 
     @staticmethod
     def is_valid_phone(value):
@@ -82,6 +121,7 @@ class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
+        self.birthday = Birthday
 
     def add_phone(self, phone: Phone):
         self.phones.append(Phone(phone))
@@ -109,7 +149,7 @@ class Record:
                 return ph
 
     # Днів до дня народження
-    def days_to_birthday(self, birthday: datetime):
+    def days_to_birthday(self, birthday: Birthday):
         self.birthday = birthday
         day_birth = datetime.strptime(birthday, "%Y.%m.%d")
         bir_th_day = day_birth.replace(
@@ -121,10 +161,10 @@ class Record:
             daybirth = bir_th_day.date() - datetime.today().date()
         else:
             daybirth = 365 - (datetime.today().date() - bir_th_day.date()).days
-        print(daybirth)
+        return daybirth
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({Record(daybirth)} day to birthday)"
 
 
 class AddressBook(UserDict):
@@ -132,6 +172,7 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
         self.name = Name
         self.value = Phone
+        # self.birthday = Birthday
         return self.data
 
     def find(self, name_user: Name):
@@ -146,15 +187,21 @@ class AddressBook(UserDict):
                 self.data.pop(key)
             return self.data
 
+    # def update_data(self, birthday: Birthday):
+    #     self.data["birth"] = birthday
+    #     return self.data
 
-class Iterator:
+
+class Iterator(AddressBook):
+    MAX_VALUE = len(AddressBook())
+
     def __init__(self):
-        self.current_value = self.data
+        self.current_value = 0
 
     def __next__(self):
         if self.current_value < self.MAX_VALUE:
             self.current_value += 1
-            return self.current_value
+            return self.data
         raise StopIteration
 
 
@@ -172,7 +219,10 @@ if __name__ == "__main__":
     john_record.add_phone("1234567890")
     book.add_record(john_record)
     john_record.days_to_birthday("2003.07.26")
-    # print(john_record)
+    john_record
+    book.add_record(john_record)
+    john_record
+    print(john_record)
     jane_record = Record("Jane")
     jane_record.add_phone("9876543210")
     book.add_record(jane_record)
