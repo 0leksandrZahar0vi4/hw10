@@ -1,26 +1,62 @@
 from collections import UserDict
+from datetime import datetime, timedelta
 import re
+import random
 
 
-# def staticmethod(func):
-#     def inner(*args):
-#         try:
-#             return func(*args)
-#         except IndexError:
-#             return "Not enough params. Use help."
-#         except KeyError:
-#             return "Unknown rec_id. Try another or use help."
-#         except TypeError:
-#             return "How can I help you?"
-#         except NameError:
-#             return "There is no such number in the dict"
+class Birthday:
+    # def gen_birth(self, date):
+    #     self.date = date
+    #     current_day = datetime.now()
+    #     old_day = current_day - timedelta(days=365 * 40)
+    #     fake_year = random.randrange(old_day.year, current_day.year)
+    #     fake_month = random.randrange(1, 12)
+    #     fake_day = random.randrange(1, 31)
+    #     try:
+    #         fake_birthday = datetime(year=fake_year, month=fake_month, day=fake_day)
+    #     except ValueError:
+    #         ...
 
-#     return inner
+    #     if current_day >= fake_birthday:
+    #         self.data["birthday"] = fake_birthday.date()
+
+    #     return self
+
+    def __init__(self, birthday) -> None:
+        self.birthday = birthday
+
+    def birth_day(self, birthday: str):
+        if not Birthday.is_valid_birth_day(birthday):
+            raise ValueError("Invalid phone number format")
+        super().__init__(birthday)
+
+    def is_valid_birth_day(self, birthday: str):
+        patern_birth = r"^(1|2)(9|0)[0-2,7-9][0-9]{1}(.|/| )(0|1)[0-9](.|/| )[0-3][0-9]"
+        return bool(re.match(patern_birth, birthday))
+
+    def day_year(self, birthday: str):
+        day_birth = datetime.strptime(birthday, "%Y.%m.%d")
+        bir_th_day = day_birth.replace(
+            year=datetime.today().year, month=day_birth.month, day=day_birth.day
+        )
+        return bir_th_day.date()
 
 
 class Field:
     def __init__(self, value):
+        self.__privat_value = None
         self.value = value
+
+    @property
+    def value(self):
+        return self.__privat_value
+
+    @value.setter
+    def value(self, value: str):
+        if value.isalpha():
+            self.__privat_value = value
+        else:
+            raise Exception("Wrong value")
 
 
 class Name(Field):
@@ -72,7 +108,20 @@ class Record:
             if ph.value == phone:
                 return ph
 
-        # return self.phones
+    # Днів до дня народження
+    def days_to_birthday(self, birthday: datetime):
+        self.birthday = birthday
+        day_birth = datetime.strptime(birthday, "%Y.%m.%d")
+        bir_th_day = day_birth.replace(
+            year=datetime.today().year, month=day_birth.month, day=day_birth.day
+        )
+        # daybirth = datetime.strptime(birthday, "%Y.%m.%d").date()
+        daybirth = datetime.today().date() - bir_th_day.date()
+        if daybirth.days < 0:
+            daybirth = bir_th_day.date() - datetime.today().date()
+        else:
+            daybirth = 365 - (datetime.today().date() - bir_th_day.date()).days
+        print(daybirth)
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
@@ -89,11 +138,6 @@ class AddressBook(UserDict):
         for key in self.data.keys():
             if key == name_user:
                 return self.data.get(key)
-            # return self.data
-
-    # if Record.name.value == name_user:
-    #     print(self.data[Phone])
-    # return self.data
 
     def delete(self, name_user: Name):
         # name_user = input("Enter name-key1: ")
@@ -103,6 +147,17 @@ class AddressBook(UserDict):
             return self.data
 
 
+class Iterator:
+    def __init__(self):
+        self.current_value = self.data
+
+    def __next__(self):
+        if self.current_value < self.MAX_VALUE:
+            self.current_value += 1
+            return self.current_value
+        raise StopIteration
+
+
 # def parser(text: str):
 #     for func, kw in .items():
 #         if text.startswith(kw):
@@ -110,29 +165,28 @@ class AddressBook(UserDict):
 #     return unknown, []
 
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    book = AddressBook()
+    john_record = Record("John")
+    john_record.add_phone("5555555555")
+    john_record.add_phone("1234567890")
+    book.add_record(john_record)
+    john_record.days_to_birthday("2003.07.26")
+    # print(john_record)
+    jane_record = Record("Jane")
+    jane_record.add_phone("9876543210")
+    book.add_record(jane_record)
 
-book = AddressBook()
-john_record = Record("John")
-john_record.add_phone("5555555555")
-john_record.add_phone("1234567890")
-book.add_record(john_record)
-# print(john_record)
-jane_record = Record("Jane")
-jane_record.add_phone("9876543210")
-book.add_record(jane_record)
+    for name, record in book.data.items():
+        print(record)
 
-for name, record in book.data.items():
-    print(record)
+    john = book.find("John")
 
-john = book.find("John")
-
-john_record.edit_phone("1234567890", "1112223333")
-print(john)
-found_phone = john_record.find_phone("5555555555")
-print(found_phone)
-john_record.find_phone("1234567890")
-found_phone2 = john_record.find_phone("1112223333")
-print(found_phone2)
-book.delete("Jane")
+    john_record.edit_phone("1234567890", "1112223333")
+    print(john)
+    found_phone = john_record.find_phone("5555555555")
+    # print(found_phone)
+    # john_record.find_phone("1234567890")
+    # found_phone2 = john_record.find_phone("1112223333")
+    # print(found_phone2)
+    # book.delete("Jane")
