@@ -40,7 +40,7 @@ class Birthday:
     def birth_day(self, birthday: str):
         if not Birthday.is_valid_birth_day(birthday):
             raise ValueError("Invalid phone number format")
-        # super().__init__(birthday)
+        super().__init__(birthday)
 
     def is_valid_birth_day(self, birthday: str):
         patern_birth = r"^(1|2)(9|0)[0-2,7-9][0-9]{1}(.|/| )(0|1)[0-9](.|/| )[0-3][0-9]"
@@ -118,7 +118,7 @@ class Phone(Field):
 
 
 class Record:
-    def __init__(self, name):
+    def __init__(self, name: Name):
         self.name = Name(name)
         self.phones = []
         self.birthday = Birthday
@@ -164,7 +164,8 @@ class Record:
         return daybirth
 
     def __str__(self):
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({Record(daybirth)} day to birthday)"
+        # return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({Record.days_to_birthday(self, self.birthday)} day to birthday))"
+        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({self.days_to_birthday(self.birthday)} day to birthday))"
 
 
 class AddressBook(UserDict):
@@ -226,17 +227,16 @@ if __name__ == "__main__":
     jane_record = Record("Jane")
     jane_record.add_phone("9876543210")
     book.add_record(jane_record)
-
-    for name, record in book.data.items():
-        print(record)
+    # print(jane_record)
+    # for name, record in book.data.items():
+    #     print(record)
 
     john = book.find("John")
 
     john_record.edit_phone("1234567890", "1112223333")
-    print(john)
-    found_phone = john_record.find_phone("5555555555")
-    # print(found_phone)
-    # john_record.find_phone("1234567890")
-    # found_phone2 = john_record.find_phone("1112223333")
+    john_record.find_phone("5555555555")
+    john_record.find_phone("1234567890")
+    print(john_record)
+    found_phone2 = john_record.find_phone("1112223333")
     # print(found_phone2)
     # book.delete("Jane")
