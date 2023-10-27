@@ -1,57 +1,8 @@
 from collections import UserDict
+from itertools import islice
 from datetime import datetime, timedelta
 import re
 import random
-
-
-class Birthday:
-    # def gen_birth(self, date):
-    #     self.date = date
-    #     current_day = datetime.now()
-    #     old_day = current_day - timedelta(days=365 * 40)
-    #     fake_year = random.randrange(old_day.year, current_day.year)
-    #     fake_month = random.randrange(1, 12)
-    #     fake_day = random.randrange(1, 31)
-    #     try:
-    #         fake_birthday = datetime(year=fake_year, month=fake_month, day=fake_day)
-    #     except ValueError:
-    #         ...
-
-    #     if current_day >= fake_birthday:
-    #         self.data["birthday"] = fake_birthday.date()
-
-    #     return self
-
-    def __init__(self, birthday) -> None:
-        self.__privat_birthday = None
-        self.birthday = birthday
-
-    @property
-    def birthday(self):
-        return self.__privat_birthday
-
-    @birthday.setter
-    def birthday(self, birthday):
-        if not Birthday.is_valid_birth_day(self, birthday):
-            self.__privat_birthday = birthday
-        else:
-            ValueError("Invalid phone number format")
-
-    def birth_day(self, birthday: str):
-        if not Birthday.is_valid_birth_day(birthday):
-            raise ValueError("Invalid phone number format")
-        super().__init__(birthday)
-
-    def is_valid_birth_day(self, birthday: str):
-        patern_birth = r"^(1|2)(9|0)[0-2,7-9][0-9]{1}(.|/| )(0|1)[0-9](.|/| )[0-3][0-9]"
-        return bool(re.match(patern_birth, birthday))
-
-    def day_year(self, birthday: str):
-        day_birth = datetime.strptime(birthday, "%Y.%m.%d")
-        bir_th_day = day_birth.replace(
-            year=datetime.today().year, month=day_birth.month, day=day_birth.day
-        )
-        return bir_th_day.date()
 
 
 class Field:
@@ -69,6 +20,34 @@ class Field:
             self.__privat_value = value
         else:
             raise Exception("Wrong value")
+
+
+class Birthday(Field):
+    def __init__(self, birthday) -> None:
+        self.__privat_birthday = None
+        self.birthday = birthday
+
+    @property
+    def birthday(self):
+        return self.__privat_birthday
+
+    @birthday.setter
+    def birthday(self, birthday):
+        if not Birthday.is_valid_birth_day(self, birthday):
+            self.__privat_birthday = birthday
+        else:
+            ValueError("Invalid phone number format")
+
+    def is_valid_birth_day(self, birthday: str):
+        patern_birth = r"^(1|2)(9|0)[0-2,7-9][0-9]{1}(.|/| )(0|1)[0-9](.|/| )[0-3][0-9]"
+        return bool(re.match(patern_birth, birthday))
+
+    def day_year(self, birthday: str):
+        day_birth = datetime.strptime(birthday, "%Y.%m.%d")
+        bir_th_day = day_birth.replace(
+            year=datetime.today().year, month=day_birth.month, day=day_birth.day
+        )
+        return bir_th_day.date()
 
 
 class Name(Field):
@@ -93,10 +72,6 @@ class Phone(Field):
     def __init__(self, value):
         self.__privat_value = None
         self.value = value
-
-        # if not Phone.is_valid_phone(value):
-        #     raise ValueError("Invalid phone number format")
-        # super().__init__(value)
 
     @property
     def value(self):
@@ -165,7 +140,10 @@ class Record:
 
     def __str__(self):
         # return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({Record.days_to_birthday(self, self.birthday)} day to birthday))"
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({self.days_to_birthday(self.birthday)} day to birthday))"
+        if Birthday.birthday:
+            return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({self.days_to_birthday(self.birthday)} day to birthday))"
+        else:
+            return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
 
 class AddressBook(UserDict):
@@ -173,7 +151,6 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
         self.name = Name
         self.value = Phone
-        # self.birthday = Birthday
         return self.data
 
     def find(self, name_user: Name):
@@ -188,22 +165,36 @@ class AddressBook(UserDict):
                 self.data.pop(key)
             return self.data
 
-    # def update_data(self, birthday: Birthday):
-    #     self.data["birth"] = birthday
-    #     return self.data
+    # def islice(self, **args):
+    #     counter = 0
+    #     while counter < len(AddressBook.data):
+    #         yield self.counter[self.counter : self.counter + n]
+    #         counter += 1
+
+    # def iterator(self, n=1):
+    #     counter = 0
+    #     while counter < len(self.data):
+    #         yield self.counter[self.counter : self.counter + n]
+    #         counter += 1
+    def search_user(self):
+        keyword = input("Enter keyword: ")
+        # result = {}
+        for key, val in self.data.items():
+            if keyword in self.data["name"] or keyword in self.data["phone"]:
+                return self.data
 
 
-class Iterator(AddressBook):
-    MAX_VALUE = len(AddressBook())
+# class Iterator:
+#     MAX_VALUE = len(AddressBook(data))
 
-    def __init__(self):
-        self.current_value = 0
+#     def __init__(self):
+#         self.current_value = 0
 
-    def __next__(self):
-        if self.current_value < self.MAX_VALUE:
-            self.current_value += 1
-            return self.data
-        raise StopIteration
+#     def __next__(self):
+#         if self.current_value < self.MAX_VALUE:
+#             self.current_value += 1
+#             return AddressBook.data
+#         raise StopIteration
 
 
 # def parser(text: str):
@@ -238,5 +229,12 @@ if __name__ == "__main__":
     john_record.find_phone("1234567890")
     print(john_record)
     found_phone2 = john_record.find_phone("1112223333")
-    # print(found_phone2)
+    # found_phone2
     # book.delete("Jane")
+    # address_book_iterator = Iterator(book)
+    # for address in address_book_iterator:
+    #     print(address)
+    # for address in AddressBook.islice(1):
+    #     print(address)
+    searh = book.search_user()
+    print(searh)
