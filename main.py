@@ -2,7 +2,7 @@ from collections import UserDict
 from itertools import islice
 from datetime import datetime, timedelta
 import re
-import random
+import pickle
 
 
 class Field:
@@ -176,6 +176,15 @@ class AddressBook(UserDict):
                 self.data.pop(key)
             return self.data
 
+    def pack_user(self):
+        file_name = "users.bin"
+        with open(file_name, "wb") as fh:
+            pickle.dump(self.data, fh)
+
+    def unpack_user(self):
+        with open("users.bin", "rb") as fh:
+            pickle.load(fh)
+
 
 class Iterator:
     MAX_VALUE = 0
@@ -235,3 +244,5 @@ if __name__ == "__main__":
     # searh =
     john_record.search_user(Record)
     # print(searh)
+    pack_user = book.pack_user()
+    unpack_user = book.unpack_user()
