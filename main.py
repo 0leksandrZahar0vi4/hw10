@@ -36,7 +36,9 @@ class Birthday(Field):
         if not Birthday.is_valid_birth_day(self, birthday):
             self.__privat_birthday = birthday
         else:
-            ValueError("Invalid phone number format")
+            ValueError("Invalid phone number format"),
+
+            TypeError("Dont birtday")
 
     def is_valid_birth_day(self, birthday: str):
         patern_birth = r"^(1|2)(9|0)[0-2,7-9][0-9]{1}(.|/| )(0|1)[0-9](.|/| )[0-3][0-9]"
@@ -103,7 +105,6 @@ class Record:
         return self.phones
 
     def edit_phone(self, ph, new_phone) -> str:
-        # for ph in self.phones:
         result = self.find_phone(ph)
         if result:
             self.remove_phone(ph)
@@ -133,15 +134,25 @@ class Record:
         # daybirth = datetime.strptime(birthday, "%Y.%m.%d").date()
         daybirth = datetime.today().date() - bir_th_day.date()
         if daybirth.days < 0:
-            daybirth = bir_th_day.date() - datetime.today().date()
+            daybirth = (bir_th_day.date() - datetime.today().date()).days
         else:
             daybirth = 365 - (datetime.today().date() - bir_th_day.date()).days
         return daybirth
 
+    def search_user(self, phone):
+        keyword = input("Enter keyword: ")
+        for ph in self.phones:
+            if (self.name.value.lower()).startswith(keyword.lower()):
+                print(f"{self.name.value} {ph.value}")
+            elif (ph.value).startswith(keyword):
+                print(f"{self.name.value} {ph.value}")
+            else:
+                print(f"No name in list with this atribyte {keyword}")
+
     def __str__(self):
         # return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({Record.days_to_birthday(self, self.birthday)} day to birthday))"
         if Birthday.birthday:
-            return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({self.days_to_birthday(self.birthday)} day to birthday))"
+            return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}, birth: {self.birthday} ({self.days_to_birthday(self.birthday)} day to birthday)"
         else:
             return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}"
 
@@ -165,36 +176,20 @@ class AddressBook(UserDict):
                 self.data.pop(key)
             return self.data
 
-    # def islice(self, **args):
-    #     counter = 0
-    #     while counter < len(AddressBook.data):
-    #         yield self.counter[self.counter : self.counter + n]
-    #         counter += 1
 
-    # def iterator(self, n=1):
-    #     counter = 0
-    #     while counter < len(self.data):
-    #         yield self.counter[self.counter : self.counter + n]
-    #         counter += 1
-    def search_user(self):
-        keyword = input("Enter keyword: ")
-        # result = {}
-        for key, val in self.data.items():
-            if keyword in self.data["name"] or keyword in self.data["phone"]:
-                return self.data
+class Iterator:
+    MAX_VALUE = 0
 
+    def __init__(self, adressBook):
+        self.current_value = 0
+        self.adressBook = AddressBook
+        self.MAX_VALUE = len(adressBook.data)
 
-# class Iterator:
-#     MAX_VALUE = len(AddressBook(data))
-
-#     def __init__(self):
-#         self.current_value = 0
-
-#     def __next__(self):
-#         if self.current_value < self.MAX_VALUE:
-#             self.current_value += 1
-#             return AddressBook.data
-#         raise StopIteration
+    def __next__(self):
+        if self.current_value < self.MAX_VALUE:
+            self.current_value += 1
+            return self.adressBook.data[self.current_value]
+        raise StopIteration
 
 
 # def parser(text: str):
@@ -216,9 +211,10 @@ if __name__ == "__main__":
     john_record
     print(john_record)
     jane_record = Record("Jane")
+    jane_record.days_to_birthday("2003.11.21")
     jane_record.add_phone("9876543210")
     book.add_record(jane_record)
-    # print(jane_record)
+    print(jane_record)
     # for name, record in book.data.items():
     #     print(record)
 
@@ -227,7 +223,7 @@ if __name__ == "__main__":
     john_record.edit_phone("1234567890", "1112223333")
     john_record.find_phone("5555555555")
     john_record.find_phone("1234567890")
-    print(john_record)
+    # print(john_record)
     found_phone2 = john_record.find_phone("1112223333")
     # found_phone2
     # book.delete("Jane")
@@ -236,5 +232,6 @@ if __name__ == "__main__":
     #     print(address)
     # for address in AddressBook.islice(1):
     #     print(address)
-    searh = book.search_user()
-    print(searh)
+    # searh =
+    john_record.search_user(Record)
+    # print(searh)
